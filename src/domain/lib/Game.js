@@ -1,3 +1,20 @@
+import { writable } from 'svelte/store';
+// 导入我们暴露的领域对象API
+import { domainGameApi } from './grid';
+
+// ... 保留你原有所有代码 ...
+
+// 添加/替换 undo/redo 方法
+export function undo() {
+  domainGameApi.undo();
+}
+
+export function redo() {
+  domainGameApi.redo();
+}
+
+// ... 保留你原有所有代码 ...
+
 import { Sudoku } from './Sudoku';
 
 export class Game {
