@@ -16,28 +16,53 @@ export class Sudoku {
   }
 
   // 兼容你的项目：获取无效单元格，返回数组 ['x,y', ...]
-  getInvalidCellsArray() {
-    const invalid = [];
-    const rowUsed = Array.from({ length: 9 }, () => new Set());
-    const colUsed = Array.from({ length: 9 }, () => new Set());
-    const boxUsed = Array.from({ length: 9 }, () => new Set());
+// 替换原来的 getInvalidCellsArray 方法
+getInvalidCellsArray() {
+  const _invalidCells = [];
+  const grid = this.grid; // 当前用户盘
+  const SUDOKU_SIZE = 9;
+  const BOX_SIZE = 3;
 
-    for (let r = 0; r < 9; r++) {
-      for (let c = 0; c < 9; c++) {
-        const val = this.grid[r][c];
-        if (val === 0) continue;
+  const addInvalid = (x, y) => {
+    const xy = x + ',' + y;
+    if (!_invalidCells.includes(xy)) _invalidCells.push(xy);
+  };
 
-        const boxIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
-        if (rowUsed[r].has(val) || colUsed[c].has(val) || boxUsed[boxIndex].has(val)) {
-          invalid.push(`${c},${r}`); // 注意：你的项目是 x,y 格式
+  for (let y = 0; y < SUDOKU_SIZE; y++) {
+    for (let x = 0; x < SUDOKU_SIZE; x++) {
+      const value = grid[y][x];
+      if (value) {
+        // 检查行和列
+        for (let i = 0; i < SUDOKU_SIZE; i++) {
+          // 检查行
+          if (i !== x && grid[y][i] === value) {
+            addInvalid(x, y);
+          }
+          // 检查列
+          if (i !== y && grid[i][x] === value) {
+            addInvalid(x, i);
+          }
         }
-        rowUsed[r].add(val);
-        colUsed[c].add(val);
-        boxUsed[boxIndex].add(val);
+
+        // 检查3x3宫格
+        const startY = Math.floor(y / BOX_SIZE) * BOX_SIZE;
+        const endY = startY + BOX_SIZE;
+        const startX = Math.floor(x / BOX_SIZE) * BOX_SIZE;
+        const endX = startX + BOX_SIZE;
+        
+        for (let row = startY; row < endY; row++) {
+          for (let col = startX; col < endX; col++) {
+            if (row !== y && col !== x && grid[row][col] === value) {
+              addInvalid(col, row);
+            }
+          }
+        }
       }
     }
-    return invalid;
   }
+
+  return _invalidCells;
+}
 
   // 兼容你的项目：userGrid 就是当前的 grid
   getUserGrid() {
